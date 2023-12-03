@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/thymeleafsecurity
+    driver-class-name: org.postgresql.Driver
+    username: ${DB_USER:user}
+    password: ${DB_PASS:admin}
+  jpa:
+    database-platform: org.postgresql.Driver
+    # defaults to create-drop when using h2
+    hibernate:
+      # ddl-auto: create-drop
+      ddl-auto: none
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect

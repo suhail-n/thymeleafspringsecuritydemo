@@ -27,7 +27,8 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 public class SecurityConfig {
 
     private static String[] getPublicRoutes() {
-        return new String[] { "/", "/login", "/signup", "/password/reset", "/css/**", "/js/**" };
+        return new String[] { "/", "/registration/verify", "/login", "/signup", "/password/reset", "/css/**",
+                "/js/**" };
     }
 
     public static MvcRequestMatcher[] getPublicMvcRoutes(HandlerMappingIntrospector introspector) {

@@ -8,8 +8,17 @@ spring:
     database-platform: org.postgresql.Driver
     # defaults to create-drop when using h2
     hibernate:
-      # ddl-auto: create-drop
-      ddl-auto: none
+      #       ddl-auto: create-drop
+      ddl-auto: update
+      # ddl-auto: none
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          time_zone: UTC
+  mail:
+    host: 127.0.0.1
+    port: 1025
+    username: ""
+    password: ""
+    protocol: smtp

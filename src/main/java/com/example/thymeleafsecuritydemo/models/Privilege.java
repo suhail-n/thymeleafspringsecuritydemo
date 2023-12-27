@@ -1,10 +1,7 @@
 package com.example.thymeleafsecuritydemo.models;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Collection;
 
@@ -22,6 +19,7 @@ public class Privilege {
     @Column(unique = true)
     private String name;
 
+    @ToString.Exclude
     @ManyToMany(mappedBy = "privileges")
     private Collection<Role> roles;
 }

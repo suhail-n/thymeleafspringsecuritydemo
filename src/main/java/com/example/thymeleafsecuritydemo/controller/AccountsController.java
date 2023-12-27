@@ -1,10 +1,14 @@
 package com.example.thymeleafsecuritydemo.controller;
 
-import java.util.Arrays;
-import java.util.List;
+import com.example.thymeleafsecuritydemo.dto.accounts.RegisterUserDto;
+import com.example.thymeleafsecuritydemo.exception.RegistrationFailException;
+import com.example.thymeleafsecuritydemo.service.AccountsService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
+
 import java.util.Optional;
 
-import com.example.thymeleafsecuritydemo.models.UserEntity;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -12,19 +16,12 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.example.thymeleafsecuritydemo.dto.accounts.RegisterUserDto;
-import com.example.thymeleafsecuritydemo.exception.RegistrationFailException;
-import com.example.thymeleafsecuritydemo.service.AccountsService;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
-
 @Controller
 public class AccountsController {
 
     private final AccountsService accountsService;
 
-    public AccountsController(AccountsService accountsService) {
+    public AccountsController(AccountsService accountsService, ApplicationEventPublisher applicationEventPublisher) {
         this.accountsService = accountsService;
     }
 
@@ -45,7 +42,7 @@ public class AccountsController {
 
     @PostMapping(path = "/signup", name = "account_signup_post")
     public String signup(@Valid @ModelAttribute("user") RegisterUserDto registerUserDto, BindingResult result,
-            Model model) {
+            Model model, final HttpServletRequest request) {
 
         // check database if username or email exists
         var usernameError = result.getFieldError("username");
@@ -72,18 +69,30 @@ public class AccountsController {
             // model.addAttribute("user", registerUserDto);
             return "accounts/signup";
         }
-        Optional<UserEntity> createdUser = this.accountsService.createUser(registerUserDto);
-        if (createdUser.isEmpty()) {
-            model.addAttribute("error", "Something went wrong. Please contact support.");
-            return "accounts/signup";
-        }
-
-        return "redirect:/signup";
+        return this.accountsService
+                .createUser(registerUserDto)
+                .map(userEntity -> {
+                    this.accountsService.sendConfirmationEmail(userEntity,
+                            this.accountsService.applicationUrl(request));
+                    return "accounts/verification_sent";
+                }).orElseGet(() -> {
+                    model.addAttribute("error", "Something went wrong. Please contact support.");
+                    return "accounts/signup";
+                });
     }
 
     @GetMapping(path = "/password/reset", name = "account_reset_password")
     public String getPasswordReset() {
         return "accounts/password_reset";
+    }
+
+    @GetMapping(path = "/registration/verify", name = "account_verify_email")
+    public String getEmailVerification(@RequestParam("token") Optional<String> token, Model model) {
+        model.addAttribute("isConfirmed", false);
+        token
+                .flatMap(this.accountsService::activateUserByToken)
+                .map(userEntity -> model.addAttribute("isConfirmed", true));
+        return "accounts/email_confirmation";
     }
 
     @ExceptionHandler(RegistrationFailException.class)
@@ -92,31 +101,5 @@ public class AccountsController {
         modelAndView.addObject("error", "");
         return modelAndView;
     }
-}
 
-/***
- *
- * @PostMapping("/register/save")
- * public String register(@Valid @ModelAttribute("user")RegistrationDto user,
- * BindingResult result, Model model) {
- * UserEntity existingUserEmail = userService.findByEmail(user.getEmail());
- * if(existingUserEmail != null && existingUserEmail.getEmail() != null &&
- * !existingUserEmail.getEmail().isEmpty()) {
- * return "redirect:/register?fail";
- * }
- * UserEntity existingUserUsername =
- * userService.findByUsername(user.getUsername());
- * if(existingUserUsername != null && existingUserUsername.getUsername() != null
- * && !existingUserUsername.getUsername().isEmpty()) {
- * return "redirect:/register?fail";
- * }
- * if(result.hasErrors()) {
- * model.addAttribute("user", user);
- * return "register";
- * }
- * userService.saveUser(user);
- * return "redirect:/clubs?success";
- * }
- *
- *
- */
+}

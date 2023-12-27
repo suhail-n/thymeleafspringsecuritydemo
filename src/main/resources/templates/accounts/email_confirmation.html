@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{components/layout}">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Confirmation</title>
+</head>
+
+<body>
+    <section layout:fragment="content">
+        <style>
+            .alert-icon {
+                width: 60px;
+                height: 60px;
+                font-size: 50px;
+            }
+        </style>
+        <div class="container">
+            <div class="row justify-content-center my-5">
+                <div class="col-10 col-md-7 d-flex shadow justify-content-center align-items-center">
+                    <div class="px-3 py-5 d-flex flex-column align-items-center">
+                        <div class="alert-icon text-danger mx-auto" th:if="${not isConfirmed}">
+                            <i class="bi bi-exclamation-circle"></i>
+                        </div>
+                        <div class="alert-icon text-success" th:if="${isConfirmed}">
+                            <i class="bi bi-check2-circle"></i>
+                        </div>
+                        <br />
+                        <h5 class="text-center p-2">Email Confirmation</h5>
+                        <p th:if="${isConfirmed}" class="text-center">Congratulations! Your account is activated.</p>
+                        <p th:if="${not isConfirmed}">Unable to confirm your email address. Your activation link is
+                            expired or already
+                            activated</p>
+                        <br />
+                        <a class="btn btn-primary w-75" th:href="${#mvc.url('account_login').build()}">Sign
+                            In</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+
+</html>

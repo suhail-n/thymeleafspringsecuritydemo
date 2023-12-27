@@ -18,6 +18,8 @@
                         <div>
                             Invalid username and password
                         </div>
+<!--                        can print the last error like user disabled -->
+<!--                        <div th:text="${session[SPRING_SECURITY_LAST_EXCEPTION]}">error</div>-->
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                     <div class="alert alert-success d-flex align-items-center alert-dismissible fade show" th:if="${param.logout}" role="alert">

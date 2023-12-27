@@ -18,3 +18,9 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.H2Dialect
+  mail:
+    host: 127.0.0.1
+    port: 1025
+    username: ""
+    password: ""
+    protocol: smtp
